@@ -8,13 +8,21 @@
 
 ### 目录
 ```text
+
+
+```
+
+
+<details>
+<summary>目录示例(用于指导目录的编写)</summary>
+```text
 sandboxLab/
 ├── docs/                                    # 文档根目录
 │   ├── MindMap.md                           # 思维导图索引
 │   │
 │   ├── 01-design-patterns/                  # 设计模式
 │   │   ├── 01-strategy-pattern/             # 策略模式
-│   │   │   ├── doc_1.md                       # 文档
+│   │   │   ├── doc_1.md                       # 文档(命名规范看下面)
 │   │   │   ├── doc_2.md                       # 文档(一篇讲不完就再来一篇, 笔记和自测题同理)
 │   │   │   ├── note.md                      # 笔记
 │   │   │   └── test.md                      # 自测题
@@ -54,6 +62,7 @@ sandboxLab/
 ├── pom.xml                                   # Maven 配置
 └── README.md                                 # 项目说明
 ```
+</details>
 
 ### 规范 && 指南 && 建议
 > 当前项目仅有docs、readme.md和mindmap.md
@@ -61,7 +70,6 @@ sandboxLab/
 #### 目录规范
 1. 文档类放在docs目录下
 2. 代码类尚未组织
-
 
 #### 代码文件规范
 1. 放在src/main下面
@@ -79,7 +87,11 @@ sandboxLab/
 - 题目要有难度才对，没难度没用
 - 可以试试easySay
 
-#### 建议的命名(对于一个写不完的情况)
+
+#### 建议的目录命令
+1. 知识点: 0x-知识点/
+
+#### 建议的文件命名(对于一个写不完的情况)
 1. 文档: 知识点_0x.md
 2. 笔记: note_0x.md
 3. 题目: test_0x.md
