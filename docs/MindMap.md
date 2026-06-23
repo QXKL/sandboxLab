@@ -231,13 +231,22 @@ docs/
 ├── MindMap.md                                   # 思维导图索引
 │
 ├── 01-design-principles/                        # 设计原则
-│   └── 01-single-responsibility-principle/      # 单一职责原则 ✅
+│   ├── 01-single-responsibility-principle/      # 单一职责原则 ✅
+│   │   ├── doc_01.md                            # 教学文档
+│   │   ├── demo/                                # 代码示例
+│   │   │   ├── README.md                        # 运行说明
+│   │   │   ├── BadExample.java                  # 违反SRP的示例
+│   │   │   └── GoodExample.java                 # 符合SRP的示例
+│   │   ├── test_01.md                           # 自测题（8道题，100分）
+│   │   └── note_template.md                     # 学习笔记模板
+│   │
+│   └── 02-open-closed-principle/                # 开闭原则 ✅
 │       ├── doc_01.md                            # 教学文档
 │       ├── demo/                                # 代码示例
 │       │   ├── README.md                        # 运行说明
-│       │   ├── BadExample.java                  # 违反SRP的示例
-│       │   └── GoodExample.java                 # 符合SRP的示例
-│       ├── test_01.md                           # 自测题（8道题，100分）
+│       │   ├── BadExample.java                  # 违反OCP的示例
+│       │   └── GoodExample.java                 # 符合OCP的示例
+│       ├── test_01.md                           # 自测题（7道题，100分）
 │       └── note_template.md                     # 学习笔记模板
 ```
 
