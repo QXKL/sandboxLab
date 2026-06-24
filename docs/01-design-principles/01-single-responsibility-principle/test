@@ -1,0 +1,225 @@
+订单类
+Order {
+    订单ID
+    用户ID
+    商品列表
+    金额
+}
+
+OrderItem {
+    商品ID
+    单价
+    数量
+    库存
+}
+
+=====
+验证类
+用户信息检查类(Order order) {
+    isCheckUserInfo()
+}
+
+商品检查类(OrderItem orderItem) {
+    isStock()
+    isPrice()
+}
+
+=====
+持久类
+
+订单持久化类 {
+    saveToDataBase(Order order)
+    updateOrderState(Order order)
+    findOrderByUserId(Integer userId)
+}
+
+库存数据持久化类 {
+    reduceStock(OrderItem orderItem)
+}
+
+=====
+发送类
+
+向用户发送邮件类(Order order) {
+    noticeEmail()
+}
+
+向用户发送短信类(Order order) {
+    noticeTextMessage()
+}
+
+=====
+日志类
+
+日志类 {
+    recordLog(String message)
+}
+
+=====
+发票类
+
+发票类 {
+    generateInvoice(Order order)
+}
+
+=====
+通知类(通知其他系统)
+
+通知系统类 {
+    sendToLogisticsSystem(Order order)
+}
+
+===============================
+再来一次
+
+-- 实体 --
+--- 实体类 ---
+class Order {
+    订单ID
+    用户信息
+    商品列表
+    总金额
+    其他订单信息
+}
+
+class OrderItem {
+    商品ID
+    单价
+    数量
+    总金额
+}
+
+class Product {
+    商品ID
+    商品信息
+    单价
+    库存
+}
+
+
+-- 服务 --
+--- 验证类 ---
+class Validation {
+    用户信息完整()
+    商品库存大于订单要求数量()
+    价格正确()
+}
+
+--- 持久化 ---
+class OrderMapper {
+    saveOrder(Order order)
+    updateOrderState(OrderId orderId)
+}
+
+class ProductMapper {
+    reduceStock(商品ID, 数量)
+}
+
+--- 服务类 ---
+
+
+--- 消息类 ---
+class SendEmail {
+    sendEmail() // 发送邮件
+}
+
+class SendText {
+    sendText() // 发送短信
+}
+
+--- 发票类 ---
+class 发票类 {
+    生成发票()
+}
+
+--- 系统通知类 ---
+class sendSystem {
+    sendLogisticsSystem() // 通知物流系统
+}
+
+--- 日志类 ---
+class RecordLog {
+    recordLog()
+}
+
+-- 流程 --
+--- 流程类 ---
+class OrderManager {
+    private 用户信息检查类 userCheck;
+    private 商品检查类 itemCheck;
+
+    private OrderMapper orderMapper;
+    private ProductMapper productMapper;
+
+    private SendEmail sendEmail;
+    private SendText sendText;
+    private RecordLog recordLog;
+
+    private 发票类 发票类;
+    private sendSystem sendSystem
+
+    createOrder()
+    payOrder()
+
+    createOrder(User user, List<product> productItems) {
+
+        if (!userCheck.检查用户信息(user.userId)) {
+            return
+        }
+
+        for i : 商品列表:
+            if (!itemCheck.isStock(i) || !itemCheck.isPrice(i)) return
+
+        Order order = new Order(填充信息)
+
+        orderMapper.saveOrder(order)
+
+        for i : 商品列表:
+            productMapper.reduceStock(i)
+
+        sendEmail.sendEmail();
+
+        recordLog.recordLog();
+
+        return
+    }
+
+    payOrder(Order order) {
+
+
+        OrderMapper.updateOrderState(order.orderId);
+        发票类.生成发票();
+        sendSystem.sendLogisticsSystem();
+        sendText.sendText();
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

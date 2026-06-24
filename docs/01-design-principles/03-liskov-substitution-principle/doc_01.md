@@ -2,27 +2,27 @@
 
 ## 一、这是什么？
 
-想象一下你在使用电池：
+想象一下电影拍摄中的**替身演员**：
 
-- 你的**遥控器**需要2节5号电池
-- 你可以用**普通碱性电池**
-- 也可以用**充电电池**
-- 甚至可以用**高性能锂电池**
+- 主角有危险动作时，用替身代替
+- 替身必须能**完美模仿**主角的动作和风格
+- 观众看不出是替身，电影剧情不受影响
+- 如果替身演得不像，观众会出戏，剧情会崩溃
 
-无论用哪种电池，遥控器都能正常工作。这些不同类型的电池可以**互相替换**，而不会破坏遥控器的功能。
-
-**里氏替换原则**就是这个道理：**子类对象必须能够替换父类对象出现的任何地方，而不影响程序的正确性**。
+**里氏替换原则**就是这个道理：**子类对象必须能够替换其父类对象，且程序行为不变**。
 
 换句话说：
-- 子类应该扩展父类的功能，而不是改变父类的行为
-- 使用父类的地方，替换成子类后，程序应该表现一致
-- 子类不应该违反父类定义的契约（约定）
+- 使用父类的地方，换成子类也应该正常工作
+- 子类不能破坏父类的"契约"（承诺的行为）
+- 子类可以扩展功能，但不能改变父类的基本行为
+
+**由来**：1987 年，Barbara Liskov 提出了这个原则，因此以她的名字命名。
 
 ## 二、为什么需要它？
 
 ### 问题场景
 
-假设你设计了一个 `Rectangle`（矩形）类：
+假设你有一个矩形类：
 
 ```java
 class Rectangle {
@@ -43,175 +43,360 @@ class Rectangle {
 }
 ```
 
-从数学角度看，**正方形是特殊的矩形**（四条边相等），所以你让 `Square` 继承 `Rectangle`：
+从数学角度看，"正方形是特殊的矩形"，所以你创建了一个子类：
 
 ```java
 class Square extends Rectangle {
     @Override
     public void setWidth(int width) {
         this.width = width;
-        this.height = width;  // 保持正方形特性：宽高相等
+        this.height = width;  // 强制宽高相等
     }
     
     @Override
     public void setHeight(int height) {
-        this.width = height;  // 保持正方形特性：宽高相等
+        this.width = height;  // 强制宽高相等
         this.height = height;
     }
 }
 ```
 
-### 这段代码的痛点
-
-看起来很合理，但实际使用时会出问题：
+现在有一个使用 Rectangle 的方法：
 
 ```java
 void resizeRectangle(Rectangle rect) {
     rect.setWidth(5);
     rect.setHeight(4);
-    
-    // 期望面积是 5 * 4 = 20
-    assert rect.getArea() == 20;  // ❌ 如果传入Square，面积是16，断言失败！
+    assert rect.getArea() == 20;  // 期望面积是 20
 }
-
-Rectangle rect = new Rectangle();
-resizeRectangle(rect);  // ✅ 通过，面积是20
-
-Square square = new Square();
-resizeRectangle(square);  // ❌ 失败，面积是16（4*4）
 ```
 
-**问题**：`Square` 不能替换 `Rectangle`，因为它改变了父类的行为约定。
+**问题来了**：
 
-使用者期望：
-- 设置宽度不会影响高度
-- 设置高度不会影响宽度
+```java
+Rectangle rect = new Rectangle();
+resizeRectangle(rect);  // ✓ 通过：面积 = 5 × 4 = 20
 
-但 `Square` 违反了这个约定，导致程序出错。
+Rectangle square = new Square();
+resizeRectangle(square);  // ✗ 失败：面积 = 4 × 4 = 16
+```
+
+### 这段代码的痛点
+
+1. **行为不一致**：Square 不能替换 Rectangle，违反了 LSP
+2. **破坏契约**：Rectangle 承诺"宽高可以独立设置"，Square 破坏了这个契约
+3. **隐藏的 bug**：代码中使用 Rectangle 的地方，传入 Square 会导致意外行为
+4. **多态失效**：虽然 Square 继承了 Rectangle，但无法正确替换
+5. **违反预期**：数学上"正方形是矩形"，但 OOP 中这个继承关系是错误的
 
 ## 三、核心思想
 
-### 子类是父类的替代品
-
-里氏替换原则的核心是：**子类必须能够完全替换父类，而不改变程序的正确性**。
+### 子类必须能够替换父类
 
 ```mermaid
 graph TB
-    A[客户端代码] -->|使用| B[父类]
-    B -.替换为.-> C[子类]
-    A -->|替换后行为一致| C
+    A[客户端代码] --> B[依赖父类]
+    B --> C{传入子类}
+    C -->|符合LSP| D[✅ 行为正常<br/>不需要修改客户端代码]
+    C -->|违反LSP| E[❌ 行为异常<br/>需要特殊判断处理]
     
-    style B fill:#ccffcc
-    style C fill:#ccffcc
+    style D fill:#ccffcc
+    style E fill:#ffcccc
 ```
 
-**遵循 LSP 的要求**：
+**核心含义**：
+- 任何使用父类的地方，都可以透明地使用子类
+- 客户端代码不需要知道具体是父类还是子类
+- 子类不能破坏父类的行为契约
 
-1. **前置条件不能加强**：子类的输入要求不能比父类更严格
-2. **后置条件不能削弱**：子类的输出保证不能比父类更弱
-3. **不变式必须保持**：父类的不变性约束在子类中依然成立
-4. **不能抛出父类未声明的异常**
-5. **历史约束必须保留**：不能改变父类已有的行为
+### 契约（Contract）的概念
 
-### 契约式设计（Design by Contract）
+**契约**是父类对外承诺的行为规范：
 
-LSP 的本质是**契约式设计**：
+1. **前置条件**（Precondition）：方法执行前必须满足的条件
+   - 子类可以**弱化**前置条件（接受更多输入）
+   - 子类**不能强化**前置条件（拒绝父类接受的输入）
+
+2. **后置条件**（Postcondition）：方法执行后必须保证的结果
+   - 子类必须**满足或强化**后置条件（保证至少和父类一样的输出）
+   - 子类**不能弱化**后置条件（输出比父类更弱）
+
+3. **不变式**（Invariant）：对象状态必须始终满足的约束
+   - 子类必须维持父类的所有不变式
 
 ```mermaid
 graph LR
-    A[父类定义契约] --> B[前置条件: 输入要求]
-    A --> C[后置条件: 输出保证]
-    A --> D[不变式: 始终成立的约束]
+    A[父类契约] --> B[前置条件]
+    A --> C[后置条件]
+    A --> D[不变式]
     
-    E[子类必须遵守] --> B
-    E --> C
-    E --> D
+    B --> E[子类可以弱化<br/>接受更多输入]
+    C --> F[子类必须强化<br/>保证输出质量]
+    D --> G[子类必须维持<br/>所有约束]
     
-    style A fill:#ffffcc
-    style E fill:#ccffff
+    style E fill:#ccffcc
+    style F fill:#ccffcc
+    style G fill:#ccffcc
 ```
 
-**契约三要素**：
+## 四、LSP 的核心要求
 
-1. **前置条件（Precondition）**：调用方法前必须满足的条件
-   - 例如：参数不能为null、必须大于0
-   - 子类可以**放宽**前置条件（接受更多输入）
-   
-2. **后置条件（Postcondition）**：方法执行后必须保证的结果
-   - 例如：返回值不为null、列表已排序
-   - 子类可以**加强**后置条件（提供更多保证）
+### 要求1：子类不能强化前置条件
 
-3. **不变式（Invariant）**：对象生命周期内始终成立的约束
-   - 例如：账户余额不能为负、列表元素唯一
-   - 子类必须**保持**不变式
+**父类**：接受任意整数
+```java
+class Parent {
+    void process(int value) {
+        // 接受任意整数
+    }
+}
+```
 
-## 四、代码示例
+**错误的子类**：只接受正整数
+```java
+class Child extends Parent {
+    @Override
+    void process(int value) {
+        if (value <= 0) {
+            throw new IllegalArgumentException("必须是正整数");  // ❌ 强化了前置条件
+        }
+        // 处理逻辑
+    }
+}
+```
+
+**问题**：客户端传入 0 或负数，父类能处理，子类却抛异常。
+
+### 要求2：子类不能弱化后置条件
+
+**父类**：保证返回非负数
+```java
+class Parent {
+    int calculate() {
+        // 保证返回 >= 0
+        return Math.abs(someValue);
+    }
+}
+```
+
+**错误的子类**：可能返回负数
+```java
+class Child extends Parent {
+    @Override
+    int calculate() {
+        return someValue;  // ❌ 可能返回负数，弱化了后置条件
+    }
+}
+```
+
+**问题**：客户端期望非负数，子类却可能返回负数。
+
+### 要求3：子类必须维持不变式
+
+**父类**：维持 balance >= 0
+```java
+class Account {
+    protected double balance;
+    
+    public void withdraw(double amount) {
+        if (balance >= amount) {
+            balance -= amount;
+        }
+        // 不变式：balance 始终 >= 0
+    }
+}
+```
+
+**错误的子类**：允许透支
+```java
+class OverdraftAccount extends Account {
+    @Override
+    public void withdraw(double amount) {
+        balance -= amount;  // ❌ 可能导致 balance < 0，破坏不变式
+    }
+}
+```
+
+### 要求4：子类不能抛出父类未声明的异常
+
+**父类**：不抛异常
+```java
+class Parent {
+    void process() {
+        // 不抛异常
+    }
+}
+```
+
+**错误的子类**：抛出新异常
+```java
+class Child extends Parent {
+    @Override
+    void process() throws IOException {  // ❌ 父类未声明 IOException
+        // 处理逻辑
+    }
+}
+```
+
+**问题**：客户端使用父类时不会捕获异常，子类抛异常会导致程序崩溃。
+
+## 五、代码示例
 
 查看 `demo/` 目录下的完整代码，这里做核心讲解。
 
-### 重构前（违反 LSP）
+### 违反 LSP 的经典案例：正方形-矩形问题
 
-`BadExample.java` 展示了 Rectangle-Square 问题：
+`BadExample.java` 展示了错误的继承关系：
 
-**父类**：
 ```java
 class Rectangle {
     protected int width;
     protected int height;
     
-    public void setWidth(int width) {
-        this.width = width;
-    }
-    
-    public void setHeight(int height) {
-        this.height = height;
-    }
-    
-    public int getArea() {
-        return width * height;
-    }
+    public void setWidth(int width) { this.width = width; }
+    public void setHeight(int height) { this.height = height; }
+    public int getArea() { return width * height; }
 }
-```
 
-**父类的契约**：
-- 前置条件：宽高可以独立设置
-- 后置条件：getArea() 返回 width * height
-- 不变式：setWidth 不影响 height，setHeight 不影响 width
-
-**子类**：
-```java
 class Square extends Rectangle {
     @Override
     public void setWidth(int width) {
         this.width = width;
-        this.height = width;  // ❌ 违反了不变式
+        this.height = width;  // 强制相等
     }
     
     @Override
     public void setHeight(int height) {
-        this.width = height;  // ❌ 违反了不变式
+        this.width = height;  // 强制相等
         this.height = height;
     }
 }
 ```
 
-**问题**：`Square` 改变了父类的行为约定，导致不能替换。
+**为什么违反 LSP？**
 
-### 重构后（符合 LSP）
+1. **破坏契约**：Rectangle 承诺"宽高可独立设置"，Square 破坏了这个承诺
+2. **行为不一致**：`setWidth()` 同时改变了 height，客户端无法预期
+3. **不可替换**：使用 Rectangle 的代码，传入 Square 会出错
 
-`GoodExample.java` 使用正确的继承层次：
-
-**方案1：使用组合代替继承**
-
+**测试**：
 ```java
-// 定义形状接口
-interface Shape {
-    int getArea();
-    String getDescription();
+void testResize(Rectangle rect) {
+    rect.setWidth(5);
+    rect.setHeight(4);
+    assert rect.getArea() == 20;  // 期望 20
 }
 
-// 矩形实现
+testResize(new Rectangle());  // ✓ 通过
+testResize(new Square());     // ✗ 失败：得到 16
+```
+
+### 符合 LSP 的重构方案
+
+`GoodExample.java` 展示了正确的设计：
+
+**方案1：取消继承关系**
+```java
+interface Shape {
+    int getArea();
+}
+
 class Rectangle implements Shape {
+    private int width;
+    private int height;
+    
+    public void setWidth(int width) { this.width = width; }
+    public void setHeight(int height) { this.height = height; }
+    public int getArea() { return width * height; }
+}
+
+class Square implements Shape {
+    private int side;
+    
+    public void setSide(int side) { this.side = side; }
+    public int getArea() { return side * side; }
+}
+```
+
+**方案2：使用组合代替继承**
+```java
+// 1. 定义形状接口（只读操作，没有修改行为）
+interface Shape {
+   int getArea();
+   int getPerimeter();
+}
+
+// 2. 矩形类（纯数据类）
+class Rectangle implements Shape {
+   private int width;
+   private int height;
+
+   public Rectangle(int width, int height) {
+      this.width = width;
+      this.height = height;
+   }
+
+   @Override
+   public int getArea() { return width * height; }
+
+   @Override
+   public int getPerimeter() { return 2 * (width + height); }
+
+   // 提供独立的修改方法（不是接口的一部分）
+   public void setWidth(int width) { this.width = width; }
+   public void setHeight(int height) { this.height = height; }
+}
+
+// 3. 正方形类（独立实现，不依赖矩形）
+class Square implements Shape {
+   private int side;
+
+   public Square(int side) {
+      this.side = side;
+   }
+
+   @Override
+   public int getArea() { return side * side; }
+
+   @Override
+   public int getPerimeter() { return 4 * side; }
+
+   public void setSide(int side) { this.side = side; }
+}
+
+// 4. 如果需要"既能当矩形用，又能当正方形用"的灵活对象
+//    用组合来实现"形状容器"
+class ShapeContainer {
+   private Shape shape;  // 组合：持有一个形状
+
+   public ShapeContainer(Shape shape) {
+      this.shape = shape;
+   }
+
+   public void displayArea() {
+      System.out.println("面积: " + shape.getArea());
+   }
+
+   // 动态替换形状（灵活！）
+   public void setShape(Shape shape) {
+      this.shape = shape;
+   }
+}
+```
+
+**方案3：不可变设计(final)**
+```
+- 所有字段都用 final 修饰
+- 没有 setXxx() 方法（没有修改器）
+- 对象创建后，你只能读取数据，不能修改数据
+```
+
+```java
+abstract class Shape {
+    abstract int getArea();
+}
+
+class Rectangle extends Shape {
     private final int width;
     private final int height;
     
@@ -220,487 +405,454 @@ class Rectangle implements Shape {
         this.height = height;
     }
     
-    @Override
-    public int getArea() {
-        return width * height;
-    }
-    
-    @Override
-    public String getDescription() {
-        return "矩形: " + width + "x" + height;
-    }
+    public int getArea() { return width * height; }
 }
 
-// 正方形实现
-class Square implements Shape {
+// 因为不存在"修改"操作，所以正方形继承矩形时，不会出现"修改宽度连带影响高度"的副作用。
+class Square extends Shape {
     private final int side;
     
     public Square(int side) {
         this.side = side;
     }
     
-    @Override
-    public int getArea() {
-        return side * side;
-    }
-    
-    @Override
-    public String getDescription() {
-        return "正方形: " + side + "x" + side;
-    }
+    public int getArea() { return side * side; }
 }
 ```
 
-**方案2：只读的形状层次**
+```text
+✅ 优点：
+- 线程安全：多个线程可以同时读取，不用担心数据被修改
+- 简化推理：对象状态不会变化，代码更容易理解
+- 可缓存：相同值的对象可以复用（比如 Integer.valueOf(5) 缓存）
+- 可以作为 Map 的 Key：因为 hashCode 不会变
 
-```java
-// 不可变的矩形基类
-abstract class Shape {
-    public abstract int getArea();
-}
-
-class Rectangle extends Shape {
-    protected final int width;
-    protected final int height;
-    
-    public Rectangle(int width, int height) {
-        this.width = width;
-        this.height = height;
-    }
-    
-    public int getWidth() { return width; }
-    public int getHeight() { return height; }
-    
-    @Override
-    public int getArea() {
-        return width * height;
-    }
-}
-
-class Square extends Rectangle {
-    public Square(int side) {
-        super(side, side);  // ✅ 不改变行为，只是特化构造方式
-    }
-}
+❌ 缺点：
+- 创建成本高：每次"修改"都要创建新对象（如果频繁修改，会消耗内存）
+- 不适合频繁变化的状态（比如游戏里的角色血量）
 ```
-
-**关键差异**：
-- ❌ 违反 LSP：子类改变了父类的可变行为（setWidth/setHeight）
-- ✅ 符合 LSP：使用不可变对象，或者平行的继承层次
 
 ### 关键设计点
 
-1. **正确识别"is-a"关系**：数学上的"is-a"不等于OOP中的"is-a"
-2. **使用不可变对象**：减少状态变化导致的契约违反
-3. **优先组合**：当继承会违反LSP时，使用组合
-4. **接口隔离**：使用接口定义共同行为，而非强制继承
+1. **正方形不应继承矩形**：虽然数学上"正方形是矩形"，但 OOP 中这个继承关系破坏了行为一致性
+2. **契约优先**：设计继承关系时，先考虑行为契约，而非"is-a"关系
+3. **不可变对象更安全**：如果对象不可变，就不会有状态不一致的问题
+4. **接口隔离**：通过接口定义共同行为，而非通过继承
 
-## 五、如何遵循里氏替换原则？
+## 六、如何判断是否违反 LSP
 
-### 检查清单
+### 判断方法1：替换测试
 
-在设计继承关系时，检查以下几点：
-
-✅ **前置条件检查**
 ```java
-// ❌ 子类加强了前置条件（更严格）
-class Parent {
-    void process(String input) {
-        // 接受任何字符串
+void someMethod(Parent parent) {
+    // 使用 parent 的方法
+}
+
+// 测试：传入子类是否正常工作？
+someMethod(new Parent());  // 原始行为
+someMethod(new Child());   // 子类行为
+
+// 如果子类导致异常或结果不符合预期，就违反了 LSP
+```
+
+### 判断方法2：契约检查
+
+问自己：
+- 子类的前置条件是否比父类更严格？（不能 更严格[更少/范围更大/对不上]）
+- 子类的后置条件是否比父类更弱？（不能 更弱[更多/范围更大/对不上]）
+- 子类是否维持了父类的所有不变式？（必须 维持[一模一样]）
+- 子类是否抛出了父类未声明的异常？（不能 抛出）
+
+### 判断方法3：行为一致性检查
+
+客户端代码是否需要：
+- 检查具体是哪个子类？（`if (obj instanceof Child)`）
+- 针对不同子类有不同处理逻辑？
+- 捕获子类特有的异常？
+
+如果需要，说明子类不能透明替换父类，违反了 LSP。
+
+### 判断方法4：is-a vs behaves-like-a
+
+- **is-a**：概念上的"是一个"关系（正方形是矩形）
+- **behaves-like-a**：行为上的"表现得像"关系
+
+**LSP 关注的是行为，而非概念**：
+- ❌ 正方形概念上是矩形，但行为不一致
+- ✅ 子类必须在行为上完全替代父类
+
+## 七、违反 LSP 的典型场景
+
+### 场景1：正方形-矩形问题（已讲）
+
+数学上的"is-a"关系，在 OOP 中可能不成立。
+
+### 场景2：鸟类继承体系
+
+**错误设计**：
+```java
+class Bird {
+    void fly() {
+        System.out.println("飞行中...");
     }
 }
 
-class Child extends Parent {
+class Penguin extends Bird {
     @Override
-    void process(String input) {
-        if (input == null || input.isEmpty()) {
-            throw new IllegalArgumentException();  // ❌ 比父类更严格
-        }
-    }
-}
-
-// ✅ 子类放宽或保持前置条件
-class GoodChild extends Parent {
-    @Override
-    void process(String input) {
-        if (input == null) input = "";  // ✅ 处理null，不抛异常
-        // 处理逻辑
+    void fly() {
+        throw new UnsupportedOperationException("企鹅不会飞");  // ❌ 违反 LSP
     }
 }
 ```
 
-✅ **后置条件检查**
+**问题**：客户端调用 `bird.fly()` 期望所有鸟都能飞，企鹅却抛异常。
+
+**正确设计**：
 ```java
-// ❌ 子类削弱了后置条件
-class Parent {
-    // 保证返回非null列表
-    List<String> getData() {
-        return new ArrayList<>();
-    }
+interface Bird {
+    void eat();
 }
 
-class Child extends Parent {
-    @Override
-    List<String> getData() {
-        return null;  // ❌ 违反了"非null"的保证
-    }
-}
-
-// ✅ 子类加强或保持后置条件
-class GoodChild extends Parent {
-    @Override
-    List<String> getData() {
-        return Collections.unmodifiableList(new ArrayList<>());  // ✅ 更强的保证
-    }
-}
-```
-
-✅ **不变式检查**
-```java
-// ❌ 子类违反了不变式
-class BankAccount {
-    protected double balance;
-    
-    // 不变式：余额不能为负
-    public void withdraw(double amount) {
-        if (balance >= amount) {
-            balance -= amount;
-        }
-    }
-}
-
-class OverdraftAccount extends BankAccount {
-    @Override
-    public void withdraw(double amount) {
-        balance -= amount;  // ❌ 允许余额为负，违反不变式
-    }
-}
-
-// ✅ 子类保持不变式
-class SafeOverdraftAccount extends BankAccount {
-    private double overdraftLimit;
-    
-    @Override
-    public void withdraw(double amount) {
-        if (balance - amount >= -overdraftLimit) {  // ✅ 保持"余额有下限"的不变式
-            balance -= amount;
-        }
-    }
-}
-```
-
-### 设计技巧
-
-**技巧1：使用抽象测试**
-
-编写测试验证子类可替换性：
-
-```java
-abstract class ShapeTest {
-    protected abstract Shape createShape();
-    
-    @Test
-    public void testAreaIsNonNegative() {
-        Shape shape = createShape();
-        assertTrue(shape.getArea() >= 0);  // 所有子类都应该通过
-    }
-}
-
-class RectangleTest extends ShapeTest {
-    @Override
-    protected Shape createShape() {
-        return new Rectangle(5, 4);
-    }
-}
-
-class SquareTest extends ShapeTest {
-    @Override
-    protected Shape createShape() {
-        return new Square(5);
-    }
-}
-```
-
-**技巧2：提取共同接口**
-
-当继承关系不合适时，提取接口：
-
-```java
-// 不用继承，用接口
-interface Flyable {
+interface FlyableBird extends Bird {
     void fly();
 }
 
-class Bird implements Flyable {
-    public void fly() { /* 飞行逻辑 */ }
+class Sparrow implements FlyableBird {
+    public void eat() { /* ... */ }
+    public void fly() { /* ... */ }
 }
 
-class Airplane implements Flyable {
-    public void fly() { /* 飞行逻辑 */ }
-}
-
-class Penguin {
-    // 企鹅不实现Flyable，因为它不会飞
-    public void swim() { /* 游泳逻辑 */ }
+class Penguin implements Bird {
+    public void eat() { /* ... */ }
+    // 不实现 fly()
 }
 ```
 
-**技巧3：使用组合代替继承**
+### 场景3：覆盖方法强化前置条件
 
+**错误设计**：
 ```java
-// 用组合而非继承
-class Rectangle {
-    private Dimension dimension;
-    
-    public Rectangle(int width, int height) {
-        this.dimension = new Dimension(width, height);
+class FileProcessor {
+    void process(File file) {
+        // 接受任意文件
     }
 }
 
-class Square {
-    private Dimension dimension;
-    
-    public Square(int side) {
-        this.dimension = new Dimension(side, side);
+class ImageProcessor extends FileProcessor {
+    @Override
+    void process(File file) {
+        if (!file.getName().endsWith(".jpg")) {
+            throw new IllegalArgumentException("只支持 JPG 文件");  // ❌ 强化前置条件
+        }
+        // 处理图片
     }
 }
 ```
 
-## 六、使用场景与实践建议
+**问题**：父类接受所有文件，子类只接受 JPG，违反了 LSP。
 
-### 典型使用场景
+### 场景4：覆盖方法弱化后置条件
 
-1. **多态集合**
-   ```java
-   List<Shape> shapes = Arrays.asList(
-       new Rectangle(5, 4),
-       new Circle(3),
-       new Triangle(3, 4, 5)
-   );
-   
-   // 所有子类都能正确替换
-   for (Shape shape : shapes) {
-       System.out.println(shape.getArea());
-   }
-   ```
+**错误设计**：
+```java
+class DataValidator {
+    boolean validate(String data) {
+        // 保证：返回 true 则数据一定有效
+        return data != null && !data.isEmpty();
+    }
+}
 
-2. **策略模式**
-   ```java
-   interface PaymentStrategy {
-       void pay(double amount);
-   }
-   
-   class CreditCardPayment implements PaymentStrategy { }
-   class PayPalPayment implements PaymentStrategy { }
-   class AlipayPayment implements PaymentStrategy { }
-   
-   // 所有策略可以互换
-   void checkout(PaymentStrategy strategy, double amount) {
-       strategy.pay(amount);
-   }
-   ```
+class LenientValidator extends DataValidator {
+    @Override
+    boolean validate(String data) {
+        // ❌ 即使数据无效也可能返回 true
+        return true;  // 弱化了后置条件
+    }
+}
+```
 
-3. **模板方法模式**
-   ```java
-   abstract class DataProcessor {
-       public final void process() {
-           load();
-           validate();
-           transform();
-           save();
-       }
-       
-       protected abstract void load();
-       protected abstract void validate();
-       protected abstract void transform();
-       protected abstract void save();
-   }
-   
-   // 子类遵循模板，保证可替换性
-   class CsvDataProcessor extends DataProcessor { }
-   class JsonDataProcessor extends DataProcessor { }
-   ```
+### 场景5：返回值类型改变
+
+**错误设计**：
+```java
+class Calculator {
+    Number calculate() {
+        return 42;  // 返回 Number
+    }
+}
+
+class IntegerCalculator extends Calculator {
+    @Override
+    Integer calculate() {  // 返回 Integer（协变返回类型，Java 允许）
+        return 42;
+    }
+}
+```
+
+这个例子实际上**不违反 LSP**，因为：
+- Java 支持协变返回类型（covariant return type）
+- Integer 是 Number 的子类，满足后置条件
+
+但如果返回不相关的类型就违反了：
+```java
+class StringCalculator extends Calculator {
+    @Override
+    String calculate() {  // ❌ 编译错误：String 不是 Number 的子类
+        return "42";
+    }
+}
+```
+
+## 八、使用场景与实践建议
+
+### 何时应用 LSP？
+
+1. **设计继承关系时**
+   - 先考虑行为契约，再考虑继承
+   - 确保子类能真正替换父类
+
+2. **使用多态时**
+   - 客户端代码依赖父类接口
+   - 各种子类应该可以透明替换
+
+3. **重构代码时**
+   - 发现需要 `instanceof` 判断时，检查是否违反了 LSP
+   - 发现子类行为与父类不一致时，重新设计继承关系
 
 ### 实践建议
 
-**何时使用继承？**
-
-- ✅ 真正的"is-a"关系（行为上的，不只是概念上的）
-- ✅ 子类扩展父类功能，不改变原有行为
-- ✅ 子类能通过所有父类的测试用例
-- ✅ 遵循LSP的所有约束
-
-**何时避免继承？**
-
-- ⚠️ 只是为了代码复用（用组合）
-- ⚠️ 子类需要禁用父类的某些功能
-- ⚠️ 子类需要改变父类的核心行为
-- ⚠️ "is-a"关系只在概念上成立，行为上不一致
-
-**设计原则**：
-
-1. **契约先行**：先定义清楚父类的契约，再设计子类
-2. **不变式优先**：尽量使用不可变对象，减少状态变化
-3. **测试验证**：用测试验证子类的可替换性
-4. **组合优于继承**：当不确定时，选择组合
-
-## 七、常见误区
-
-### 误区1：概念上的"is-a"等于代码上的"is-a"
-
-❌ **错误理解**：
+**优先使用组合而非继承**
 ```java
-// 数学上：正方形是矩形
-class Square extends Rectangle { }
+// 不好：继承可能违反 LSP
+class Stack extends ArrayList { }
 
-// 生物学上：企鹅是鸟
-class Penguin extends Bird {
-    public void fly() {
-        throw new UnsupportedOperationException("企鹅不会飞");
+// 更好：组合
+class Stack {
+    private List<Object> elements = new ArrayList<>();
+    
+    public void push(Object item) {
+        elements.add(item);
+    }
+    
+    public Object pop() {
+        return elements.remove(elements.size() - 1);
     }
 }
 ```
 
+**接口隔离**
+- 定义多个小接口，而非一个大接口
+- 子类只实现它能履行契约的接口
+
+**不可变对象**
+- 不可变对象不会有状态不一致问题
+- 更容易满足 LSP
+
+**明确契约**
+- 在文档/注释中明确前置条件、后置条件、不变式
+- 使用断言（assert）验证契约
+
+## 九、常见误区
+
+### 误区1：is-a 关系就应该用继承
+
+❌ **错误理解**：
+"正方形是矩形，所以 Square 应该继承 Rectangle"
+
 ✅ **正确理解**：
-- OOP的"is-a"是**行为上的替代关系**，不是分类学关系
-- 如果子类不能完全替换父类，就不应该继承
+- 概念上的 is-a 不等于行为上的 behaves-like-a
+- 继承要看行为契约，而非概念关系
+- 正方形的行为不符合矩形的契约（宽高独立设置）
 
-```java
-// 正确设计
-interface Flyable { void fly(); }
-interface Swimmable { void swim(); }
-
-class Sparrow implements Flyable { }
-class Penguin implements Swimmable { }  // 企鹅不继承Flyable
-```
-
-### 误区2：子类可以通过抛异常来"禁用"父类方法
+### 误区2：子类可以随意覆盖父类方法
 
 ❌ **错误做法**：
 ```java
-class ReadOnlyList extends ArrayList {
-    @Override
-    public boolean add(Object o) {
-        throw new UnsupportedOperationException();  // ❌ 违反LSP
-    }
-}
-```
-
-**问题**：使用者期望所有 `ArrayList` 都可以添加元素，但 `ReadOnlyList` 打破了这个契约。
-
-✅ **正确做法**：
-```java
-// 使用只读接口
-interface ReadOnlyList<E> {
-    E get(int index);
-    int size();
-}
-
-// 或使用工具类
-List<String> readOnly = Collections.unmodifiableList(list);
-```
-
-### 误区3：子类必须实现父类的所有方法
-
-**澄清**：这是接口的要求，不是LSP的要求。
-
-LSP 关注的是：
-- ✅ 实现的方法是否遵守契约
-- ❌ 不是方法的数量
-
-```java
-abstract class Animal {
-    abstract void eat();
-    abstract void sleep();
-}
-
-class Dog extends Animal {
-    void eat() { /* 必须实现 */ }
-    void sleep() { /* 必须实现 */ }
-    void bark() { /* 子类可以有额外方法 */ }
-}
-```
-
-### 误区4：LSP 限制了子类的扩展
-
-❌ **错误理解**：LSP 要求子类和父类行为完全一致，不能扩展
-
-✅ **正确理解**：
-- LSP 允许子类**扩展**功能
-- LSP 禁止子类**改变**已有的行为
-
-```java
 class Parent {
-    public int calculate(int x) {
-        return x * 2;
+    void doSomething() {
+        // 原有逻辑
     }
 }
 
 class Child extends Parent {
     @Override
-    public int calculate(int x) {
-        return x * 2;  // ✅ 保持父类行为
-    }
-    
-    public int calculateSquare(int x) {  // ✅ 扩展新功能
-        return x * x;
+    void doSomething() {
+        // 完全不同的逻辑，不调用 super.doSomething()
     }
 }
 ```
 
-## 八、与其他原则的关系
+✅ **正确做法**：
+- 覆盖方法应该增强或扩展父类行为，而非完全替换
+- 如果需要完全不同的行为，考虑不用继承
 
-### LSP vs 开闭原则（OCP）
+### 误区3：LSP 只关心方法签名
 
-| 对比维度 | 里氏替换原则（LSP） | 开闭原则（OCP） |
-|---------|------------------|----------------|
-| **关注点** | 继承的正确性 | 扩展性 |
-| **目标** | 子类可以替换父类 | 通过扩展而非修改来应对变化 |
-| **实现** | 契约式设计 | 抽象 + 多态 |
-| **关系** | LSP 是 OCP 的基础 | OCP 依赖于 LSP |
+**LSP 不仅关心签名，更关心行为**：
+- 方法签名相同，但行为不一致，仍然违反 LSP
+- 例如：正方形的 `setWidth()` 签名和矩形一样，但行为不同
+
+### 误区4：子类抛出子异常没问题
+
+❌ **错误认识**：
+```java
+
+
+class Parent {
+   void process() {  // 不抛异常
+   }
+}
+
+class Child extends Parent {
+   @Override
+   void process() throws IOException {  // ❌ 父类未声明任何异常
+   }
+}
+```
+**问题**在于抛出父类未声明的异常。
+
+下面有一个正确的例子：
+```java
+class Parent {
+   void process() throws Exception { }
+}
+
+class Child extends Parent {
+   @Override
+   void process() throws IOException {  // IOException 是 Exception 的子类
+      // 逻辑
+   }
+}
+```
+这个例子里：
+- 客户端代码已经捕获了 Exception
+- IOException 是 Exception 的子类，在捕获范围内
+
+### 误区5：LSP 意味着不能修改任何行为
+
+❌ **过度理解**：
+"子类不能修改父类的任何行为"
+
+✅ **正确理解**：
+- 子类可以**扩展**功能（增加新方法）
+- 子类可以**优化**实现（更高效的算法）
+- 子类可以**强化**后置条件（返回更精确的结果）
+- 子类可以**弱化**前置条件（接受更多输入）
+
+**关键**：不能破坏父类的行为契约。
+
+## 十、与其他原则的关系
+
+### LSP vs OCP
+
+**关系**：LSP 是实现 OCP 的基础
+
+```mermaid
+graph LR
+    A[依赖父类/接口<br/>DIP] --> B[子类正确替换父类<br/>LSP]
+    B --> C[扩展时不修改代码<br/>OCP]
+    
+    style A fill:#e1f5ff
+    style B fill:#fff9e1
+    style C fill:#e8f5e9
+```
+
+**解释**：
+- **OCP** 要求通过扩展（子类）来应对变化
+- 如果子类不能正确替换父类（违反 LSP），扩展就会失败
+- 因此，LSP 保证了 OCP 的有效性
+
+**示例**：
+```java
+// OCP：通过扩展添加新功能
+interface Shape {
+    double getArea();
+}
+
+class Circle implements Shape {
+    public double getArea() { /* ... */ }
+}
+
+// LSP：子类必须正确实现契约
+class Ellipse implements Shape {
+    public double getArea() { 
+        // ✓ 正确实现面积计算
+        return Math.PI * a * b;
+    }
+}
+
+// 客户端代码：依赖抽象
+void printArea(Shape shape) {
+    System.out.println(shape.getArea());  // 任何 Shape 都能正确工作
+}
+```
+
+### LSP vs SRP
+
+**区别**：
+- **SRP**：关注职责划分（一个类只做一件事）
+- **LSP**：关注继承关系（子类能否替换父类）
 
 **联系**：
-- OCP 通过多态实现扩展，而多态依赖于可替换的子类
-- 如果子类不能替换父类（违反LSP），多态就会失效
-- LSP 保证了 OCP 中"对扩展开放"的可靠性
+- 职责单一的类更容易定义清晰的契约
+- 契约清晰的类更容易被正确继承
 
-### LSP vs 依赖倒置原则（DIP）
+### LSP vs ISP（接口隔离原则）
 
-- **LSP** 保证继承层次的正确性
-- **DIP** 强调依赖抽象而非具体
-- DIP 依赖LSP：依赖抽象时，具体实现必须可替换
+**联系**：
+- ISP 要求接口尽量小，职责单一
+- 小接口更容易被完整实现，不容易违反 LSP
+- 大接口可能导致子类实现部分方法时破坏契约
 
-### LSP vs 接口隔离原则（ISP）
+**示例**：
+```java
+// 大接口：容易违反 LSP
+interface Bird {
+    void eat();
+    void fly();  // 企鹅无法实现
+}
 
-- **LSP** 关注继承关系中的替代性
-- **ISP** 关注接口的设计（不要强迫实现不需要的方法）
-- 当子类不能实现父类的所有方法时，既违反LSP也违反ISP
+// 小接口：符合 LSP
+interface Bird {
+    void eat();
+}
 
-## 九、总结
+interface FlyableBird extends Bird {
+    void fly();
+}
+```
 
-**一句话记住 LSP**：子类必须能够替换父类，而不改变程序的正确性。
+## 十一、总结
+
+**一句话记住 LSP**：子类对象必须能够替换父类对象，且程序行为不变。
 
 **核心价值**：
-- ✅ 保证多态的可靠性
-- ✅ 提高代码的可预测性
-- ✅ 降低继承带来的风险
+- ✅ 保证多态的正确性
+- ✅ 让继承体系更健壮
 - ✅ 支持开闭原则的实现
+- ✅ 提高代码的可预测性
 
-**实现关键**：
-1. **契约式设计**：明确定义父类的前置条件、后置条件、不变式
-2. **前置条件不强化**：子类的输入要求不能更严格
-3. **后置条件不弱化**：子类的输出保证不能更弱
-4. **不变式必须保持**：父类的约束在子类中依然成立
+**实践要点**：
+1. **契约优先**：设计继承时先考虑行为契约
+2. **行为一致性**：子类行为必须与父类一致
+3. **替换测试**：用子类替换父类，验证是否正常工作
+4. **组合优于继承**：遇到难以满足 LSP 的场景，考虑用组合
+
+**判断违反 LSP 的信号**：
+- 需要用 `instanceof` 判断具体类型
+- 子类抛出父类未声明的异常
+- 子类覆盖方法后行为完全不同
+- 使用父类的代码，传入子类会出错
 
 **实践口诀**：
-> 父类的契约要牢记，  
-> 子类替换无障碍，  
-> 行为一致才继承，  
-> 概念相似不算数。
+> 父类契约要牢记，  
+> 子类替换无问题，  
+> 行为一致是关键，  
+> 多态才能真给力。
 
 ---
 
 **下一步**：
-1. 运行 `demo/` 中的代码，体会违反LSP和遵循LSP的区别
-2. 完成 `test_01.md` 的自测题
-3. 思考：你的项目中哪些继承关系违反了LSP？如何重构？
+1. 运行 `demo/` 中的代码，体会正方形-矩形问题
+2. 完成 `test_01.md` 的自测题（重点做鸟类继承体系的设计）
+3. 思考：你的项目中是否有违反 LSP 的继承关系？

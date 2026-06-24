@@ -320,6 +320,43 @@ class NotificationService {
 
 **适用场景**：多种算法、多种实现方式
 
+<details>
+<summary>例子</summary>
+```
+
+```java
+import MessageResult;
+
+import UserIdDTO;
+import RevicerIdDTO;
+import UserMessageDTO;
+
+public interface MessageSender {
+   MessageResult send(UserIdDTO userIdDTO, RevicerIdDTO revicerIdDTO, UserMessageDTO userMessageDTO);
+}
+
+class EMSMessageSender implements MessageSender { 
+    @Override
+    MessageResult send(UserIdDTO userIdDTO, RevicerIdDTO revicerIdDTO, UserMessageDTO userMessageDTO) {
+        // 具体实现
+    }
+}
+
+class AntiMessageSender implements MessageSender {
+    private String key;
+    
+    AntiMessageSender(String key) {
+        this.key = key;
+    }
+    
+    @Override
+    MessageResult send(UserIdDTO userIdDTO, RevicerIdDTO revicerIdDTO, UserMessageDTO userMessageDTO) {
+       // 具体实现
+    }
+}
+```
+</details>
+
 ### 策略2：依赖注入（DI）
 
 - 通过构造函数、setter 或容器注入依赖
@@ -327,6 +364,113 @@ class NotificationService {
 - Spring 框架的核心思想
 
 **适用场景**：需要运行时切换实现
+
+<details>
+<summary>例子</summary>
+```
+
+```java
+import ShowResult;
+
+import Programer;
+
+import java.awt.*;
+import java.util.ArrayList;
+
+public interface Program {
+   ShowResult show(Programer programer);
+}
+
+class GUGAProgram implements Program {
+   @Override
+   ShowResult show(Programer programer) {
+      // 具体实现
+   }
+}
+
+class AntiProgram implements Program {
+   private String key;
+
+   AntiProgram(String key) {
+      this.key = key;
+   }
+
+   @Override
+   ShowResult show(Programer programer) {
+      // 具体实现
+   }
+}
+
+class StageService {
+    Program program;
+
+    StageService() {}
+
+    StageService(Program program) {
+        this.program = program;
+    }
+
+    boolean setProgram(Program program) {
+        this.program = program;
+    }
+   
+    boolean show() {
+        if (this.program != null) this.program.show();
+   }
+}
+```
+
+```java
+import ShowResult;
+
+import Programer;
+
+import java.awt.*;
+import java.util.ArrayList;
+
+public interface Program {
+   ShowResult show(Programer programer);
+}
+
+class GUGAProgram implements Program {
+   @Override
+   ShowResult show(Programer programer) {
+      // 具体实现
+   }
+}
+
+class AntiProgram implements Program {
+   private String key;
+
+   AntiProgram(String key) {
+      this.key = key;
+   }
+
+   @Override
+   ShowResult show(Programer programer) {
+      // 具体实现
+   }
+}
+
+class StageService {
+    List<Program> programs = new ArrayList<>();
+
+    boolean addProgram(Program program) {
+       programs.add(program);
+    }
+
+   boolean removeProgram(Program program) {
+      programs.remove(program);
+   }
+   
+   boolean showAll() {
+        for (Program p : programs) {
+            programs.show();
+      }
+   }
+}
+```
+</details>
 
 ### 策略3：策略模式
 
@@ -336,6 +480,46 @@ class NotificationService {
 
 **适用场景**：多种计算方式、多种处理逻辑
 
+<details>
+```
+
+```java
+// 1. 定义策略接口（算法行为）
+interface PaymentStrategy {
+    void pay(double amount);
+}
+
+// 2. 具体的策略实现
+class Alipay implements PaymentStrategy { ... }
+class WechatPay implements PaymentStrategy { ... }
+
+// 3. 策略的上下文（使用算法的客户）
+class OrderContext {
+private PaymentStrategy strategy;
+
+    // 运行时可以通过这个 Set 方法随时切换支付策略
+    void setPaymentStrategy(PaymentStrategy strategy) {
+        this.strategy = strategy;
+    }
+
+    void executePay(double amount) {
+        // 具体的策略去执行，Context 本身不关心你是用微信还是支付宝
+        this.strategy.pay(amount);
+    }
+}
+```
+
+```text
+实际上，实现方式和上面的set是差不多的。只是目的不同
+```
+
+| 维度   | 依赖注入（DI / Set方法）                                           | 策略模式（Strategy Pattern）                        |
+|------|------------------------------------------------------------|-----------------------------------------------|
+| 关注点  | 解耦与控制反转。关注的是“我（StageService）不想自己去 new 一个具体的节目，谁用我谁给我注入进来”。 | 算法的互换。关注的是“业务有多种平行且等价的计算/处理方式，我要根据不同的场景随时切换”。 |
+| 角色关系 | 注入的对象通常是宿主类的一个组件或依赖项。                                      | 注入的对象是一个独立的算法/逻辑单元（Strategy）。                 |
+
+</details>
+
 ### 策略4：观察者模式
 
 - 定义对象间的一对多依赖
@@ -344,6 +528,63 @@ class NotificationService {
 
 **适用场景**：事件驱动、消息订阅
 
+<details>
+```
+
+```text
+神秘伪代码
+
+List<依赖者> a;
+
+setDto(Dto dto) {
+this.dto = dto
+notifyAll(this.dto)
+}
+
+notityAll(){
+for i in a {i.方法(this.dto)}
+}
+
+
+```
+
+```java
+// 1. 观察者接口（依赖者）
+interface Observer {
+    void update(UserDto dto);
+}
+
+// 2. 具体的观察者（比如：短信通知服务、积分服务）
+class SmsService implements Observer { ... }
+class LogService implements Observer { ... }
+
+// 3. 被观察的主题（Subject）
+class UserService {
+    // 这就是你写的：List<依赖者> a;
+    private List<Observer> observers = new ArrayList<>();
+    private UserDto dto;
+
+    // 允许别人关注我
+    void attach(Observer o) { observers.add(o); }
+
+    // 你的 setDto 逻辑
+    void updateUserStatus(UserDto newDto) {
+        this.dto = newDto;
+        
+        // 状态变了，立刻调用你写的 notifyAll()
+        notifyAllObservers();
+    }
+
+    // 你的 notifyAll 逻辑
+    private void notifyAllObservers() {
+        for (Observer o : observers) {
+            o.update(this.dto); // 挨个调用他们的方法，把新数据传过去
+        }
+    }
+}
+```
+</details>
+
 ### 策略5：模板方法模式
 
 - 在抽象类中定义算法骨架
@@ -351,6 +592,59 @@ class NotificationService {
 - 新增子类不需要修改父类
 
 **适用场景**：流程固定、细节可变
+
+<details>
+```
+
+```java
+// 1. 抽象父类：定义算法骨架
+abstract class AbstractWithdrawFlow {
+
+    // 【核心核心！】这就是“模板方法”，它是一个具体方法，定义了不可改变的骨架流程
+    public final void executeWithdraw(double amount) {
+        verifyUser();               // 第一步：校验（通用逻辑）
+        
+        double fee = calculateFee(amount); // 第二步：算费（延迟到子类 ⚠️）
+        
+        doTransfer(amount - fee);   // 第三步：转账（延迟到子类 ⚠️）
+        
+        logTransaction();           // 第四步：记录日志（通用逻辑）
+    }
+
+    // 通用步骤，直接在父类实现，子类共享
+    private void verifyUser() { System.out.println("安全风控校验..."); }
+    private void logTransaction() { System.out.println("写入持久化日志..."); }
+
+    // 【抽象方法】留给子类去实现的“变化细节”
+    protected abstract double calculateFee(double amount);
+    protected abstract void doTransfer(double money);
+}
+
+// 2. 具体子类 A：微信提现
+class WechatWithdraw extends AbstractWithdrawFlow {
+    @Override
+    protected double calculateFee(double amount) { 
+        return amount * 0.001; // 微信收千分之一手续费
+    }
+    @Override
+    protected void doTransfer(double money) { 
+        System.out.println("调用微信转账API，金额：" + money); 
+    }
+}
+
+// 3. 具体子类 B：银行卡提现
+class BankWithdraw extends AbstractWithdrawFlow {
+    @Override
+    protected double calculateFee(double amount) { 
+        return 5.0; // 银行卡每笔固定 5 块钱
+    }
+    @Override
+    protected void doTransfer(double money) { 
+        System.out.println("调用银联联机网关，金额：" + money); 
+    }
+}
+```
+</details>
 
 ## 七、使用场景与实践建议
 

@@ -1,33 +1,46 @@
 /**
  * 符合里氏替换原则的示例
  *
- * 解决方案：使用正确的抽象层次，避免错误的继承关系
+ * 解决方案：取消 Square 继承 Rectangle 的关系
+ * - 虽然数学上"正方形是矩形"，但 OOP 中这个继承关系会破坏行为契约
+ * - 重新设计：让 Rectangle 和 Square 都实现共同的 Shape 接口
+ * - 各自有独立的行为契约，互不影响
  */
 
-// ========== 方案1: 使用接口 + 组合（推荐） ==========
-
+// ========== 抽象层 ==========
 /**
- * Shape接口 - 定义所有形状的共同行为
- * 不包含可变状态，只定义查询操作
+ * Shape 接口 - 定义图形的共同行为
+ *
+ * 契约：
+ * - 所有图形都能计算面积
  */
 interface Shape {
     int getArea();
-    String getDescription();
+    String getName();
 }
 
+// ========== 具体实现 ==========
 /**
- * Rectangle - 矩形实现
- * 使用不可变设计，避免状态变化带来的契约问题
+ * Rectangle - 矩形
+ *
+ * 契约：
+ * - 宽度和高度可以独立设置
+ * - 面积 = 宽度 × 高度
  */
 class Rectangle implements Shape {
-    private final int width;
-    private final int height;
+    private int width;
+    private int height;
 
     public Rectangle(int width, int height) {
-        if (width <= 0 || height <= 0) {
-            throw new IllegalArgumentException("宽度和高度必须大于0");
-        }
         this.width = width;
+        this.height = height;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public void setHeight(int height) {
         this.height = height;
     }
 
@@ -45,33 +58,37 @@ class Rectangle implements Shape {
     }
 
     @Override
-    public String getDescription() {
-        return "矩形[宽=" + width + ", 高=" + height + ", 面积=" + getArea() + "]";
+    public String getName() {
+        return "矩形";
     }
 
-    /**
-     * 创建新的矩形（不修改当前对象）
-     */
-    public Rectangle withWidth(int newWidth) {
-        return new Rectangle(newWidth, this.height);
-    }
-
-    public Rectangle withHeight(int newHeight) {
-        return new Rectangle(this.width, newHeight);
+    @Override
+    public String toString() {
+        return "Rectangle{width=" + width + ", height=" + height + ", area=" + getArea() + "}";
     }
 }
 
 /**
- * Square - 正方形实现
- * 不继承Rectangle，而是独立实现Shape接口
+ * Square - 正方形
+ *
+ * 契约：
+ * - 边长必须相等（这是正方形自己的契约，不影响其他类）
+ * - 面积 = 边长²
+ *
+ * 重要：Square 不再继承 Rectangle，各自独立
  */
 class Square implements Shape {
-    private final int side;
+    private int side;
 
     public Square(int side) {
-        if (side <= 0) {
-            throw new IllegalArgumentException("边长必须大于0");
-        }
+        this.side = side;
+    }
+
+    /**
+     * 设置边长
+     * 注意：这是 Square 自己的方法，不会与 Rectangle 的 setWidth/setHeight 冲突
+     */
+    public void setSide(int side) {
         this.side = side;
     }
 
@@ -85,29 +102,29 @@ class Square implements Shape {
     }
 
     @Override
-    public String getDescription() {
-        return "正方形[边长=" + side + ", 面积=" + getArea() + "]";
+    public String getName() {
+        return "正方形";
     }
 
-    /**
-     * 创建新的正方形（不修改当前对象）
-     */
-    public Square withSide(int newSide) {
-        return new Square(newSide);
+    @Override
+    public String toString() {
+        return "Square{side=" + side + ", area=" + getArea() + "}";
     }
 }
 
 /**
- * Circle - 圆形实现
- * 演示多种形状都可以实现Shape接口
+ * Circle - 圆形（演示扩展性）
+ *
+ * 新增图形时，不影响 Rectangle 和 Square
  */
 class Circle implements Shape {
-    private final int radius;
+    private int radius;
 
     public Circle(int radius) {
-        if (radius <= 0) {
-            throw new IllegalArgumentException("半径必须大于0");
-        }
+        this.radius = radius;
+    }
+
+    public void setRadius(int radius) {
         this.radius = radius;
     }
 
@@ -121,185 +138,145 @@ class Circle implements Shape {
     }
 
     @Override
-    public String getDescription() {
-        return "圆形[半径=" + radius + ", 面积=" + getArea() + "]";
-    }
-
-    public Circle withRadius(int newRadius) {
-        return new Circle(newRadius);
-    }
-}
-
-// ========== 方案2: 只读的继承层次（备选方案） ==========
-
-/**
- * 如果确实需要继承，可以使用只读的基类
- * 关键：不提供setter方法，避免状态变化
- */
-abstract class ReadOnlyShape {
-    public abstract int getArea();
-    public abstract String getType();
-}
-
-class ReadOnlyRectangle extends ReadOnlyShape {
-    protected final int width;
-    protected final int height;
-
-    public ReadOnlyRectangle(int width, int height) {
-        this.width = width;
-        this.height = height;
-    }
-
-    public int getWidth() { return width; }
-    public int getHeight() { return height; }
-
-    @Override
-    public int getArea() {
-        return width * height;
+    public String getName() {
+        return "圆形";
     }
 
     @Override
-    public String getType() {
-        return "Rectangle";
-    }
-}
-
-class ReadOnlySquare extends ReadOnlyRectangle {
-    public ReadOnlySquare(int side) {
-        super(side, side);  // ✅ 不改变行为，只是特化构造
-    }
-
-    @Override
-    public String getType() {
-        return "Square";
+    public String toString() {
+        return "Circle{radius=" + radius + ", area=" + getArea() + "}";
     }
 }
 
 // ========== 客户端代码 ==========
-
-public class GoodExample {
-
+/**
+ * ShapeProcessor - 图形处理器
+ *
+ * 关键：依赖 Shape 接口，不依赖具体实现
+ * - 所有 Shape 的实现都能正确替换
+ * - 符合里氏替换原则
+ */
+class ShapeProcessor {
     /**
-     * 使用Shape接口，所有实现都可以替换
+     * 打印图形信息
+     *
+     * 任何 Shape 的实现都能正确工作
      */
-    public static void processShape(Shape shape) {
-        System.out.println("  处理形状: " + shape.getDescription());
+    public void printShapeInfo(Shape shape) {
+        System.out.println(shape.getName() + ": " + shape);
         System.out.println("  面积: " + shape.getArea());
     }
 
     /**
-     * 演示多态：不同的形状实现可以互相替换
+     * 批量处理图形
      */
-    public static void demonstratePolymorphism() {
-        System.out.println("=== 演示：所有Shape实现都可以替换 ===\n");
-
-        Shape[] shapes = {
-            new Rectangle(5, 4),
-            new Square(5),
-            new Circle(3)
-        };
-
+    public void processShapes(Shape[] shapes) {
+        System.out.println("批量处理 " + shapes.length + " 个图形:");
         for (Shape shape : shapes) {
-            processShape(shape);
-            System.out.println();
+            printShapeInfo(shape);
         }
-
-        System.out.println("✓ 所有形状都遵循Shape接口的契约");
-        System.out.println("✓ 可以放心地替换，不会出现意外行为\n");
     }
+}
 
-    /**
-     * 演示不可变设计的好处
-     */
-    public static void demonstrateImmutability() {
-        System.out.println("=== 演示：不可变设计避免契约冲突 ===\n");
-
-        Rectangle rect = new Rectangle(5, 4);
-        System.out.println("  原始矩形: " + rect.getDescription());
-
-        // 创建新对象而不是修改原对象
-        Rectangle newRect = rect.withWidth(10).withHeight(8);
-        System.out.println("  修改后的矩形: " + newRect.getDescription());
-        System.out.println("  原始矩形不变: " + rect.getDescription());
-
-        System.out.println("\n✓ 不可变对象没有状态变化，不存在契约冲突");
-        System.out.println("✓ 线程安全，不需要同步");
-        System.out.println("✓ 更容易推理代码行为\n");
-    }
-
-    /**
-     * 演示只读继承层次
-     */
-    public static void demonstrateReadOnlyHierarchy() {
-        System.out.println("=== 演示：只读继承层次的可替换性 ===\n");
-
-        ReadOnlyShape rect = new ReadOnlyRectangle(5, 4);
-        ReadOnlyShape square = new ReadOnlySquare(5);
-
-        System.out.println("  " + rect.getType() + " 面积: " + rect.getArea());
-        System.out.println("  " + square.getType() + " 面积: " + square.getArea());
-
-        System.out.println("\n✓ 只读对象可以安全地继承");
-        System.out.println("✓ 没有setter，就没有行为契约冲突\n");
-    }
-
-    /**
-     * 对比违反LSP和遵循LSP的设计
-     */
-    public static void compareDesigns() {
-        System.out.println("=== 设计对比 ===\n");
-
-        System.out.println("❌ 违反LSP的设计（BadExample）：");
-        System.out.println("  - Square继承Rectangle");
-        System.out.println("  - 重写setWidth/setHeight，改变了父类行为");
-        System.out.println("  - 子类不能替换父类");
-        System.out.println("  - 多态失效，代码不可预测\n");
-
-        System.out.println("✅ 遵循LSP的设计（GoodExample）：");
-        System.out.println("  - 方案1: Rectangle和Square都实现Shape接口");
-        System.out.println("  - 方案2: 使用不可变对象，避免状态变化");
-        System.out.println("  - 所有实现都遵循接口契约");
-        System.out.println("  - 可以安全地替换，多态可靠\n");
-    }
-
+// ========== 运行示例 ==========
+public class GoodExample {
     public static void main(String[] args) {
-        System.out.println("【改进方案】符合里氏替换原则的设计：\n");
-        System.out.println("核心思想：");
-        System.out.println("✓ 接口定义契约，所有实现必须遵守");
-        System.out.println("✓ 使用不可变对象，避免状态变化导致的契约冲突");
-        System.out.println("✓ 组合优于继承，避免错误的继承关系");
-        System.out.println("✓ 子类可以扩展功能，但不能改变已有行为\n");
+        System.out.println("=== 符合里氏替换原则的示例 ===\n");
+
+        // 创建各种图形
+        Rectangle rect = new Rectangle(5, 4);
+        Square square = new Square(4);
+        Circle circle = new Circle(3);
+
+        System.out.println("【创建图形】");
+        System.out.println("矩形: 宽=5, 高=4");
+        System.out.println("正方形: 边长=4");
+        System.out.println("圆形: 半径=3");
+
+        // 使用 Shape 接口统一处理
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("【使用 Shape 接口统一处理】");
         System.out.println("=".repeat(60) + "\n");
 
-        // 演示1：多态的可靠性
-        demonstratePolymorphism();
+        ShapeProcessor processor = new ShapeProcessor();
+
+        // 所有图形都能正确工作（符合 LSP）
+        processor.printShapeInfo(rect);
+        System.out.println();
+        processor.printShapeInfo(square);
+        System.out.println();
+        processor.printShapeInfo(circle);
+
+        // 批量处理
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("【批量处理】");
         System.out.println("=".repeat(60) + "\n");
 
-        // 演示2：不可变设计
-        demonstrateImmutability();
+        Shape[] shapes = {rect, square, circle};
+        processor.processShapes(shapes);
+
+        // 演示各自独立的行为
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("【各自独立的行为】");
         System.out.println("=".repeat(60) + "\n");
 
-        // 演示3：只读继承
-        demonstrateReadOnlyHierarchy();
-        System.out.println("=".repeat(60) + "\n");
+        System.out.println("矩形：可以独立设置宽和高");
+        rect.setWidth(10);
+        System.out.println("  设置宽度为 10: " + rect);
+        rect.setHeight(3);
+        System.out.println("  设置高度为 3: " + rect);
 
-        // 对比总结
-        compareDesigns();
-        System.out.println("=".repeat(60) + "\n");
+        System.out.println("\n正方形：只能设置边长");
+        square.setSide(6);
+        System.out.println("  设置边长为 6: " + square);
 
-        System.out.println("💡 关键启示：");
-        System.out.println("1. 数学/概念上的\"is-a\"不等于代码上的\"is-a\"");
-        System.out.println("2. 继承是强耦合关系，要谨慎使用");
-        System.out.println("3. 优先使用接口和组合，而非继承");
-        System.out.println("4. 不可变对象天然符合LSP");
-        System.out.println("5. 子类必须能够替换父类，这是多态的前提\n");
+        System.out.println("\n圆形：只能设置半径");
+        circle.setRadius(5);
+        System.out.println("  设置半径为 5: " + circle);
 
-        System.out.println("📊 设计原则：");
-        System.out.println("✓ 契约式设计：明确定义前置条件、后置条件、不变式");
-        System.out.println("✓ 前置条件不强化：子类的输入要求不能更严格");
-        System.out.println("✓ 后置条件不弱化：子类的输出保证不能更弱");
-        System.out.println("✓ 不变式必须保持：父类的约束在子类中依然成立\n");
+        // 优势总结
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("✅ 符合里氏替换原则的优势");
+        System.out.println("=".repeat(60));
 
-        System.out.println("🎯 记住：子类必须能够替换父类，而不改变程序的正确性！");
+        System.out.println("\n【行为一致性】");
+        System.out.println("✓ Rectangle 和 Square 各自有独立的契约");
+        System.out.println("✓ 不会互相干扰");
+        System.out.println("✓ 客户端通过 Shape 接口统一使用");
+
+        System.out.println("\n【可替换性】");
+        System.out.println("✓ 所有 Shape 的实现都能正确替换");
+        System.out.println("✓ 客户端不需要知道具体类型");
+        System.out.println("✓ 不需要 instanceof 判断");
+
+        System.out.println("\n【扩展性】");
+        System.out.println("✓ 新增图形（如 Circle）不影响现有代码");
+        System.out.println("✓ 符合开闭原则（对扩展开放，对修改关闭）");
+
+        System.out.println("\n【设计清晰】");
+        System.out.println("✓ Rectangle 专注于矩形的行为");
+        System.out.println("✓ Square 专注于正方形的行为");
+        System.out.println("✓ 职责清晰，易于维护");
+
+        // 对比 BadExample
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("【对比 BadExample】");
+        System.out.println("=".repeat(60));
+
+        System.out.println("\nBadExample（违反LSP）:");
+        System.out.println("  ✗ Square 继承 Rectangle");
+        System.out.println("  ✗ Square 破坏了 Rectangle 的契约");
+        System.out.println("  ✗ 客户端代码用 Square 替换 Rectangle 会出错");
+        System.out.println("  ✗ 需要 instanceof 判断并特殊处理");
+
+        System.out.println("\nGoodExample（符合LSP）:");
+        System.out.println("  ✓ Rectangle 和 Square 独立实现 Shape");
+        System.out.println("  ✓ 各自有明确的契约，互不干扰");
+        System.out.println("  ✓ 客户端代码使用任何 Shape 都正常工作");
+        System.out.println("  ✓ 不需要特殊判断，代码简洁清晰");
+
+        System.out.println("\n🎯 核心教训：");
+        System.out.println("概念上的 is-a 关系 ≠ 行为上的 behaves-like-a 关系");
+        System.out.println("继承要看行为契约，而非概念关系！");
     }
 }
