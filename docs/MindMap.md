@@ -240,12 +240,21 @@ docs/
 │   │   ├── test_01.md                           # 自测题（8道题，100分）
 │   │   └── note_template.md                     # 学习笔记模板
 │   │
-│   └── 02-open-closed-principle/                # 开闭原则 ✅
+│   ├── 02-open-closed-principle/                # 开闭原则 ✅
+│   │   ├── doc_01.md                            # 教学文档
+│   │   ├── demo/                                # 代码示例
+│   │   │   ├── README.md                        # 运行说明
+│   │   │   ├── BadExample.java                  # 违反OCP的示例
+│   │   │   └── GoodExample.java                 # 符合OCP的示例
+│   │   ├── test_01.md                           # 自测题（7道题，100分）
+│   │   └── note_template.md                     # 学习笔记模板
+│   │
+│   └── 03-liskov-substitution-principle/        # 里氏替换原则 ✅
 │       ├── doc_01.md                            # 教学文档
 │       ├── demo/                                # 代码示例
 │       │   ├── README.md                        # 运行说明
-│       │   ├── BadExample.java                  # 违反OCP的示例
-│       │   └── GoodExample.java                 # 符合OCP的示例
+│       │   ├── BadExample.java                  # 违反LSP的示例（正方形-矩形问题）
+│       │   └── GoodExample.java                 # 符合LSP的示例
 │       ├── test_01.md                           # 自测题（7道题，100分）
 │       └── note_template.md                     # 学习笔记模板
 ```
