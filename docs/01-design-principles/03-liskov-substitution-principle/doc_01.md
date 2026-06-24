@@ -320,34 +320,67 @@ class Square implements Shape {
 
 **方案2：使用组合代替继承**
 ```java
+// 1. 定义形状接口（只读操作，没有修改行为）
 interface Shape {
-    int getArea();
-    void resize(int width, int height);
+   int getArea();
+   int getPerimeter();
 }
 
+// 2. 矩形类（纯数据类）
 class Rectangle implements Shape {
-    private int width;
-    private int height;
-    
-    public void resize(int width, int height) {
-        this.width = width;
-        this.height = height;
-    }
-    
-    public int getArea() { return width * height; }
+   private int width;
+   private int height;
+
+   public Rectangle(int width, int height) {
+      this.width = width;
+      this.height = height;
+   }
+
+   @Override
+   public int getArea() { return width * height; }
+
+   @Override
+   public int getPerimeter() { return 2 * (width + height); }
+
+   // 提供独立的修改方法（不是接口的一部分）
+   public void setWidth(int width) { this.width = width; }
+   public void setHeight(int height) { this.height = height; }
 }
 
+// 3. 正方形类（独立实现，不依赖矩形）
 class Square implements Shape {
-    private int side;
-    
-    public void resize(int width, int height) {
-        if (width != height) {
-            throw new IllegalArgumentException("正方形的宽高必须相等");
-        }
-        this.side = width;
-    }
-    
-    public int getArea() { return side * side; }
+   private int side;
+
+   public Square(int side) {
+      this.side = side;
+   }
+
+   @Override
+   public int getArea() { return side * side; }
+
+   @Override
+   public int getPerimeter() { return 4 * side; }
+
+   public void setSide(int side) { this.side = side; }
+}
+
+// 4. 如果需要"既能当矩形用，又能当正方形用"的灵活对象
+//    用组合来实现"形状容器"
+class ShapeContainer {
+   private Shape shape;  // 组合：持有一个形状
+
+   public ShapeContainer(Shape shape) {
+      this.shape = shape;
+   }
+
+   public void displayArea() {
+      System.out.println("面积: " + shape.getArea());
+   }
+
+   // 动态替换形状（灵活！）
+   public void setShape(Shape shape) {
+      this.shape = shape;
+   }
 }
 ```
 
