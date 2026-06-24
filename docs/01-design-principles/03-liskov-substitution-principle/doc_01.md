@@ -384,7 +384,13 @@ class ShapeContainer {
 }
 ```
 
-**方案3：不可变设计**
+**方案3：不可变设计(final)**
+```
+- 所有字段都用 final 修饰
+- 没有 setXxx() 方法（没有修改器）
+- 对象创建后，你只能读取数据，不能修改数据
+```
+
 ```java
 abstract class Shape {
     abstract int getArea();
@@ -402,6 +408,7 @@ class Rectangle extends Shape {
     public int getArea() { return width * height; }
 }
 
+// 因为不存在"修改"操作，所以正方形继承矩形时，不会出现"修改宽度连带影响高度"的副作用。
 class Square extends Shape {
     private final int side;
     
@@ -411,6 +418,18 @@ class Square extends Shape {
     
     public int getArea() { return side * side; }
 }
+```
+
+```text
+✅ 优点：
+- 线程安全：多个线程可以同时读取，不用担心数据被修改
+- 简化推理：对象状态不会变化，代码更容易理解
+- 可缓存：相同值的对象可以复用（比如 Integer.valueOf(5) 缓存）
+- 可以作为 Map 的 Key：因为 hashCode 不会变
+
+❌ 缺点：
+- 创建成本高：每次"修改"都要创建新对象（如果频繁修改，会消耗内存）
+- 不适合频繁变化的状态（比如游戏里的角色血量）
 ```
 
 ### 关键设计点
