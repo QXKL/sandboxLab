@@ -285,15 +285,24 @@ docs/
     │   ├── test_01.md                           # 自测题（6道题，100分）
     │   └── note_template.md                     # 学习笔记模板
     │
-    └── 02-factory-pattern/                      # 工厂模式 ✅
-        ├── doc_01.md                            # 简单工厂 + 工厂方法
-        ├── doc_02.md                            # 抽象工厂
+    ├── 02-factory-pattern/                      # 工厂模式 ✅
+    │   ├── doc_01.md                            # 简单工厂 + 工厂方法
+    │   ├── doc_02.md                            # 抽象工厂
+    │   ├── demo/                                # 代码示例
+    │   │   ├── README.md                        # 运行说明
+    │   │   ├── SimpleFactoryDemo.java           # 简单工厂示例（图形系统）
+    │   │   ├── FactoryMethodDemo.java           # 工厂方法示例（支付系统）
+    │   │   └── AbstractFactoryDemo.java         # 抽象工厂示例（数据库访问层）
+    │   ├── test_01.md                           # 自测题（7道题，100分）
+    │   └── note_template.md                     # 学习笔记模板
+    │
+    └── 03-builder-pattern/                      # 建造者模式 ✅
+        ├── doc_01.md                            # 教学文档
         ├── demo/                                # 代码示例
         │   ├── README.md                        # 运行说明
-        │   ├── SimpleFactoryDemo.java           # 简单工厂示例（图形系统）
-        │   ├── FactoryMethodDemo.java           # 工厂方法示例（支付系统）
-        │   └── AbstractFactoryDemo.java         # 抽象工厂示例（数据库访问层）
-        ├── test_01.md                           # 自测题（7道题，100分）
+        │   ├── BadExample.java                  # 不使用Builder的问题（Telescoping Constructor）
+        │   └── GoodExample.java                 # 使用Builder模式的标准实现
+        ├── test_01.md                           # 自测题（9道题，100分）
         └── note_template.md                     # 学习笔记模板
 ```
 
