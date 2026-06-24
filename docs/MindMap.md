@@ -230,7 +230,7 @@
 docs/
 ├── MindMap.md                                   # 思维导图索引
 │
-├── 01-design-principles/                        # 设计原则
+├── 01-design-principles/                        # 设计原则 ✅ 已完成
 │   ├── 01-single-responsibility-principle/      # 单一职责原则 ✅
 │   │   ├── doc_01.md                            # 教学文档
 │   │   ├── demo/                                # 代码示例
@@ -275,6 +275,26 @@ docs/
 │       │   └── GoodExample.java                 # 符合DIP的示例（依赖注入）
 │       ├── test_01.md                           # 自测题（5道题，100分）
 │       └── note_template.md                     # 学习笔记模板
+│
+└── 02-design-patterns/                          # 设计模式（23种经典模式）
+    ├── 01-singleton-pattern/                    # 单例模式 ✅
+    │   ├── doc_01.md                            # 教学文档
+    │   ├── demo/                                # 代码示例
+    │   │   ├── README.md                        # 运行说明
+    │   │   └── SingletonDemo.java               # 6种实现方式对比
+    │   ├── test_01.md                           # 自测题（6道题，100分）
+    │   └── note_template.md                     # 学习笔记模板
+    │
+    └── 02-factory-pattern/                      # 工厂模式 ✅
+        ├── doc_01.md                            # 简单工厂 + 工厂方法
+        ├── doc_02.md                            # 抽象工厂
+        ├── demo/                                # 代码示例
+        │   ├── README.md                        # 运行说明
+        │   ├── SimpleFactoryDemo.java           # 简单工厂示例（图形系统）
+        │   ├── FactoryMethodDemo.java           # 工厂方法示例（支付系统）
+        │   └── AbstractFactoryDemo.java         # 抽象工厂示例（数据库访问层）
+        ├── test_01.md                           # 自测题（7道题，100分）
+        └── note_template.md                     # 学习笔记模板
 ```
 
 
