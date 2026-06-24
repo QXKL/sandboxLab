@@ -458,10 +458,10 @@ someMethod(new Child());   // 子类行为
 ### 判断方法2：契约检查
 
 问自己：
-- 子类的前置条件是否比父类更严格？（不能更严格）
-- 子类的后置条件是否比父类更弱？（不能更弱）
-- 子类是否维持了父类的所有不变式？（必须维持）
-- 子类是否抛出了父类未声明的异常？（不能抛出）
+- 子类的前置条件是否比父类更严格？（不能 更严格[更少/范围更大/对不上]）
+- 子类的后置条件是否比父类更弱？（不能 更弱[更多/范围更大/对不上]）
+- 子类是否维持了父类的所有不变式？（必须 维持[一模一样]）
+- 子类是否抛出了父类未声明的异常？（不能 抛出）
 
 ### 判断方法3：行为一致性检查
 
@@ -558,7 +558,7 @@ class ImageProcessor extends FileProcessor {
 class DataValidator {
     boolean validate(String data) {
         // 保证：返回 true 则数据一定有效
-        return data != null && data.length() > 0;
+        return data != null && !data.isEmpty();
     }
 }
 
@@ -696,35 +696,37 @@ class Child extends Parent {
 
 ❌ **错误认识**：
 ```java
+
+
 class Parent {
-    void process() throws Exception { }
+   void process() {  // 不抛异常
+   }
 }
 
 class Child extends Parent {
-    @Override
-    void process() throws IOException {  // IOException 是 Exception 的子类
-        // 逻辑
-    }
+   @Override
+   void process() throws IOException {  // ❌ 父类未声明任何异常
+   }
 }
 ```
+**问题**在于抛出父类未声明的异常。
 
-这个例子**实际上没问题**，因为：
-- 客户端代码已经捕获了 Exception
-- IOException 是 Exception 的子类，在捕获范围内
-
-**真正的问题**是抛出父类未声明的异常：
+下面有一个正确的例子：
 ```java
 class Parent {
-    void process() {  // 不抛异常
-    }
+   void process() throws Exception { }
 }
 
 class Child extends Parent {
-    @Override
-    void process() throws IOException {  // ❌ 父类未声明任何异常
-    }
+   @Override
+   void process() throws IOException {  // IOException 是 Exception 的子类
+      // 逻辑
+   }
 }
 ```
+这个例子里：
+- 客户端代码已经捕获了 Exception
+- IOException 是 Exception 的子类，在捕获范围内
 
 ### 误区5：LSP 意味着不能修改任何行为
 
