@@ -249,13 +249,31 @@ docs/
 │   │   ├── test_01.md                           # 自测题（7道题，100分）
 │   │   └── note_template.md                     # 学习笔记模板
 │   │
-│   └── 03-liskov-substitution-principle/        # 里氏替换原则 ✅
+│   ├── 03-liskov-substitution-principle/        # 里氏替换原则 ✅
+│   │   ├── doc_01.md                            # 教学文档
+│   │   ├── demo/                                # 代码示例
+│   │   │   ├── README.md                        # 运行说明
+│   │   │   ├── BadExample.java                  # 违反LSP的示例（正方形-矩形问题）
+│   │   │   └── GoodExample.java                 # 符合LSP的示例
+│   │   ├── test_01.md                           # 自测题（7道题，100分）
+│   │   └── note_template.md                     # 学习笔记模板
+│   │
+│   ├── 04-interface-segregation-principle/      # 接口隔离原则 ✅
+│   │   ├── doc_01.md                            # 教学文档
+│   │   ├── demo/                                # 代码示例
+│   │   │   ├── README.md                        # 运行说明
+│   │   │   ├── BadExample.java                  # 违反ISP的示例（胖接口问题）
+│   │   │   └── GoodExample.java                 # 符合ISP的示例
+│   │   ├── test_01.md                           # 自测题（6道题，100分）
+│   │   └── note_template.md                     # 学习笔记模板
+│   │
+│   └── 05-dependency-inversion-principle/       # 依赖倒置原则 ✅
 │       ├── doc_01.md                            # 教学文档
 │       ├── demo/                                # 代码示例
 │       │   ├── README.md                        # 运行说明
-│       │   ├── BadExample.java                  # 违反LSP的示例（正方形-矩形问题）
-│       │   └── GoodExample.java                 # 符合LSP的示例
-│       ├── test_01.md                           # 自测题（7道题，100分）
+│       │   ├── BadExample.java                  # 违反DIP的示例
+│       │   └── GoodExample.java                 # 符合DIP的示例（依赖注入）
+│       ├── test_01.md                           # 自测题（5道题，100分）
 │       └── note_template.md                     # 学习笔记模板
 ```
 
