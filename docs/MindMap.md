@@ -30,7 +30,7 @@
 **结构型模式**
 - 适配器模式 ✅
 - 装饰器模式 ✅
-- 代理模式
+- 代理模式 ✅
 - 外观模式
 - 桥接模式
 - 组合模式
@@ -326,13 +326,23 @@ docs/
     │   ├── test_01.md                           # 自测题（6道题，100分）
     │   └── note_template.md                     # 学习笔记模板
     │
-    └── 06-decorator-pattern/                    # 装饰器模式 ✅
+    ├── 06-decorator-pattern/                    # 装饰器模式 ✅
+    │   ├── doc_01.md                            # 教学文档
+    │   ├── demo/                                # 代码示例
+    │   │   ├── README.md                        # 运行说明
+    │   │   ├── CoffeeDecoratorDemo.java         # 咖啡装饰器
+    │   │   ├── TextDecoratorDemo.java           # 文本装饰器
+    │   │   └── IoStreamDemo.java                # I/O流装饰器
+    │   ├── test_01.md                           # 自测题（6道题，100分）
+    │   └── note_template.md                     # 学习笔记模板
+    │
+    └── 07-proxy-pattern/                        # 代理模式 ✅
         ├── doc_01.md                            # 教学文档
         ├── demo/                                # 代码示例
         │   ├── README.md                        # 运行说明
-        │   ├── CoffeeDecoratorDemo.java         # 咖啡装饰器
-        │   ├── TextDecoratorDemo.java           # 文本装饰器
-        │   └── IoStreamDemo.java                # I/O流装饰器
+        │   ├── VirtualProxyDemo.java            # 虚拟代理（懒加载）
+        │   ├── ProtectionProxyDemo.java         # 保护代理（权限控制）
+        │   └── CacheProxyDemo.java              # 缓存代理（性能优化）
         ├── test_01.md                           # 自测题（6道题，100分）
         └── note_template.md                     # 学习笔记模板
 ```
