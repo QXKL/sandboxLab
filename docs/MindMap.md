@@ -33,7 +33,7 @@
 - 代理模式 ✅
 - 外观模式 ✅
 - 桥接模式 ✅
-- 组合模式
+- 组合模式 ✅
 - 享元模式
 
 **行为型模式**
@@ -356,12 +356,21 @@ docs/
     │   ├── test_01.md                           # 自测题（6道题，100分）
     │   └── note_template.md                     # 学习笔记模板
     │
-    └── 09-bridge-pattern/                       # 桥接模式 ✅
+    ├── 09-bridge-pattern/                       # 桥接模式 ✅
+    │   ├── doc_01.md                            # 教学文档
+    │   ├── demo/                                # 代码示例
+    │   │   ├── README.md                        # 运行说明
+    │   │   ├── RemoteControlBridgeDemo.java     # 遥控器与电视
+    │   │   └── ShapeBridgeDemo.java             # 形状与颜色
+    │   ├── test_01.md                           # 自测题（6道题，100分）
+    │   └── note_template.md                     # 学习笔记模板
+    │
+    └── 10-composite-pattern/                    # 组合模式 ✅
         ├── doc_01.md                            # 教学文档
         ├── demo/                                # 代码示例
         │   ├── README.md                        # 运行说明
-        │   ├── RemoteControlBridgeDemo.java     # 遥控器与电视
-        │   └── ShapeBridgeDemo.java             # 形状与颜色
+        │   ├── FileSystemDemo.java              # 文件系统示例
+        │   └── CompanyStructureDemo.java        # 公司组织架构示例
         ├── test_01.md                           # 自测题（6道题，100分）
         └── note_template.md                     # 学习笔记模板
 ```
