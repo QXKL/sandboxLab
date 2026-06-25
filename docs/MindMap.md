@@ -296,14 +296,24 @@ docs/
     │   ├── test_01.md                           # 自测题（7道题，100分）
     │   └── note_template.md                     # 学习笔记模板
     │
-    └── 03-builder-pattern/                      # 建造者模式 ✅
+    ├── 03-builder-pattern/                      # 建造者模式 ✅
+    │   ├── doc_01.md                            # 教学文档
+    │   ├── demo/                                # 代码示例
+    │   │   ├── README.md                        # 运行说明
+    │   │   ├── BasicBuilderDemo.java            # 经典建造者（电脑组装）
+    │   │   ├── ChainBuilderDemo.java            # 链式建造者（SQL+User）
+    │   │   └── DirectorBuilderDemo.java         # Director模式（套餐构建）
+    │   ├── test_01.md                           # 自测题（7道题，100分）
+    │   └── note_template.md                     # 学习笔记模板
+    │
+    └── 04-prototype-pattern/                    # 原型模式 ✅
         ├── doc_01.md                            # 教学文档
         ├── demo/                                # 代码示例
         │   ├── README.md                        # 运行说明
-        │   ├── BasicBuilderDemo.java            # 经典建造者（电脑组装）
-        │   ├── ChainBuilderDemo.java            # 链式建造者（SQL+User）
-        │   └── DirectorBuilderDemo.java         # Director模式（套餐构建）
-        ├── test_01.md                           # 自测题（7道题，100分）
+        │   ├── ShallowCopyDemo.java             # 浅拷贝问题演示
+        │   ├── DeepCopyDemo.java                # 深拷贝三种实现
+        │   └── PrototypeRegistryDemo.java       # 原型注册表
+        ├── test_01.md                           # 自测题（6道题，100分）
         └── note_template.md                     # 学习笔记模板
 ```
 
