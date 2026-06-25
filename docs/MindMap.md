@@ -31,7 +31,7 @@
 - 适配器模式 ✅
 - 装饰器模式 ✅
 - 代理模式 ✅
-- 外观模式
+- 外观模式 ✅
 - 桥接模式
 - 组合模式
 - 享元模式
@@ -336,13 +336,23 @@ docs/
     │   ├── test_01.md                           # 自测题（6道题，100分）
     │   └── note_template.md                     # 学习笔记模板
     │
-    └── 07-proxy-pattern/                        # 代理模式 ✅
+    ├── 07-proxy-pattern/                        # 代理模式 ✅
+    │   ├── doc_01.md                            # 教学文档
+    │   ├── demo/                                # 代码示例
+    │   │   ├── README.md                        # 运行说明
+    │   │   ├── VirtualProxyDemo.java            # 虚拟代理（懒加载）
+    │   │   ├── ProtectionProxyDemo.java         # 保护代理（权限控制）
+    │   │   └── CacheProxyDemo.java              # 缓存代理（性能优化）
+    │   ├── test_01.md                           # 自测题（6道题，100分）
+    │   └── note_template.md                     # 学习笔记模板
+    │
+    └── 08-facade-pattern/                       # 外观模式 ✅
         ├── doc_01.md                            # 教学文档
         ├── demo/                                # 代码示例
         │   ├── README.md                        # 运行说明
-        │   ├── VirtualProxyDemo.java            # 虚拟代理（懒加载）
-        │   ├── ProtectionProxyDemo.java         # 保护代理（权限控制）
-        │   └── CacheProxyDemo.java              # 缓存代理（性能优化）
+        │   ├── HomeTheaterFacadeDemo.java       # 家庭影院外观
+        │   ├── OrderFacadeDemo.java             # 订单处理外观
+        │   └── DatabaseFacadeDemo.java          # 数据库操作外观
         ├── test_01.md                           # 自测题（6道题，100分）
         └── note_template.md                     # 学习笔记模板
 ```
