@@ -34,7 +34,7 @@
 - 外观模式 ✅
 - 桥接模式 ✅
 - 组合模式 ✅
-- 享元模式
+- 享元模式 ✅
 
 **行为型模式**
 - 策略模式
@@ -365,13 +365,22 @@ docs/
     │   ├── test_01.md                           # 自测题（6道题，100分）
     │   └── note_template.md                     # 学习笔记模板
     │
-    └── 10-composite-pattern/                    # 组合模式 ✅
+    ├── 10-composite-pattern/                    # 组合模式 ✅
+    │   ├── doc_01.md                            # 教学文档
+    │   ├── demo/                                # 代码示例
+    │   │   ├── README.md                        # 运行说明
+    │   │   ├── FileSystemDemo.java              # 文件系统示例
+    │   │   └── CompanyStructureDemo.java        # 公司组织架构示例
+    │   ├── test_01.md                           # 自测题（6道题，100分）
+    │   └── note_template.md                     # 学习笔记模板
+    │
+    └── 11-flyweight-pattern/                    # 享元模式 ✅
         ├── doc_01.md                            # 教学文档
         ├── demo/                                # 代码示例
         │   ├── README.md                        # 运行说明
-        │   ├── FileSystemDemo.java              # 文件系统示例
-        │   └── CompanyStructureDemo.java        # 公司组织架构示例
-        ├── test_01.md                           # 自测题（6道题，100分）
+        │   ├── ChessPieceDemo.java              # 围棋棋子示例
+        │   └── TextEditorDemo.java              # 文本编辑器示例
+        ├── test_01.md                           # 自测题（7道题，100分）
         └── note_template.md                     # 学习笔记模板
 ```
 
