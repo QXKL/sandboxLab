@@ -37,7 +37,7 @@
 - 享元模式 ✅
 
 **行为型模式**
-- 策略模式
+- 策略模式 ✅
 - 观察者模式
 - 模板方法模式
 - 责任链模式
@@ -374,12 +374,21 @@ docs/
     │   ├── test_01.md                           # 自测题（6道题，100分）
     │   └── note_template.md                     # 学习笔记模板
     │
-    └── 11-flyweight-pattern/                    # 享元模式 ✅
+    ├── 11-flyweight-pattern/                    # 享元模式 ✅
+    │   ├── doc_01.md                            # 教学文档
+    │   ├── demo/                                # 代码示例
+    │   │   ├── README.md                        # 运行说明
+    │   │   ├── ChessPieceDemo.java              # 围棋棋子示例
+    │   │   └── TextEditorDemo.java              # 文本编辑器示例
+    │   ├── test_01.md                           # 自测题（7道题，100分）
+    │   └── note_template.md                     # 学习笔记模板
+    │
+    └── 12-strategy-pattern/                     # 策略模式 ✅
         ├── doc_01.md                            # 教学文档
         ├── demo/                                # 代码示例
         │   ├── README.md                        # 运行说明
-        │   ├── ChessPieceDemo.java              # 围棋棋子示例
-        │   └── TextEditorDemo.java              # 文本编辑器示例
+        │   ├── PaymentStrategyDemo.java         # 支付策略示例
+        │   └── SortStrategyDemo.java            # 排序策略示例
         ├── test_01.md                           # 自测题（7道题，100分）
         └── note_template.md                     # 学习笔记模板
 ```
