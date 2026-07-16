@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.qx</groupId>
-    <artifactId>basicDemo</artifactId>
+    <artifactId>sandboxLab</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>basicDemo</name>
     <description>basicDemo</description>
@@ -132,6 +132,11 @@
                         </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <source>21</source>
+                    <target>21</target>
+                    <compilerArgs>--enable-preview</compilerArgs>
+                </configuration>
             </plugin>
         </plugins>
     </build>
