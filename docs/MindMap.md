@@ -74,11 +74,11 @@
 - gRPC
 - OpenAPI / Swagger
 
-**API 安全**
-- 认证与鉴权（JWT、OAuth2、API Key）
-- HTTPS/TLS
-- 跨域（CORS）
-- 限流与防刷
+**API 安全** ✅
+- 认证与鉴权（JWT、OAuth2、API Key）✅
+- HTTPS/TLS ✅
+- 跨域（CORS）✅
+- 限流与防刷 ✅
 
 #### 05 数据库相关
 - 事务隔离级别
@@ -393,13 +393,25 @@ docs/
         └── note_template.md                     # 学习笔记模板
 
 ├── 04-api-design/                               # API设计
-    └── 01-restful-api/                          # RESTful API设计 ✅
-        ├── doc_01.md                            # RESTful基础（资源命名、HTTP方法、状态码）
-        ├── doc_02.md                            # RESTful进阶（版本管理、分页、HATEOAS）
+    ├── 01-restful-api/                          # RESTful API设计 ✅
+    │   ├── doc_01.md                            # RESTful基础（资源命名、HTTP方法、状态码）
+    │   ├── doc_02.md                            # RESTful进阶（版本管理、分页、HATEOAS）
+    │   ├── demo/                                # 代码示例
+    │   │   ├── README.md                        # 运行说明
+    │   │   ├── UserApiDemo.java                 # 完整的用户管理API示例
+    │   │   └── ApiDesignComparison.java         # 好vs坏的API设计对比
+    │   ├── test_01.md                           # 自测题（9道题，100分）
+    │   └── note_template.md                     # 学习笔记模板
+    │
+    └── 02-api-security/                         # API安全 ✅
+        ├── doc_01.md                            # 认证与鉴权（JWT、OAuth、HTTPS）
+        ├── doc_02.md                            # 常见安全威胁（OWASP Top 10、注入、XSS、CSRF）
+        ├── doc_03.md                            # 安全最佳实践（限流、输入验证、错误处理）
         ├── demo/                                # 代码示例
         │   ├── README.md                        # 运行说明
-        │   ├── UserApiDemo.java                 # 完整的用户管理API示例
-        │   └── ApiDesignComparison.java         # 好vs坏的API设计对比
+        │   ├── JwtAuthDemo.java                 # JWT认证完整流程
+        │   ├── RateLimitDemo.java               # 限流算法实现对比
+        │   └── SecurityDemo.java                # 安全漏洞与防护对比
         ├── test_01.md                           # 自测题（9道题，100分）
         └── note_template.md                     # 学习笔记模板
 ```
